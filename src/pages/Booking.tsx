@@ -1,0 +1,228 @@
+import { useEffect, useRef, useState } from "react";
+
+export default function Booking() {
+  const [form, setForm] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    address: "",
+    service: "",
+    date: "",
+    time: "",
+    notes: ""
+  });
+
+  const [errors, setErrors] = useState<any>({});
+  const [toast, setToast] = useState("");
+
+  const [openService, setOpenService] = useState(false);
+  const [openPicker, setOpenPicker] = useState<"date" | "time" | null>(null);
+
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const isValidEmail = (email: string) =>
+    /\S+@\S+\.\S+/.test(email);
+
+  const isValidPhone = (phone: string) =>
+    /^[0-9]{10}$/.test(phone);
+
+  useEffect(() => {
+    const handleClickOutside = (e: any) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target)
+      ) {
+        setOpenService(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const getDates = () => {
+    const arr = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date();
+      d.setDate(d.getDate() + i);
+      arr.push(d);
+    }
+    return arr;
+  };
+
+  const times = [
+    "08:00 AM","09:00 AM","10:00 AM","11:00 AM",
+    "12:00 PM","01:00 PM","02:00 PM","03:00 PM",
+    "04:00 PM","05:00 PM","06:00 PM","07:00 PM"
+  ];
+
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    const { name, value } = e.target;
+
+    setForm({ ...form, [name]: value });
+
+    setErrors((prev: any) => {
+      const updated = { ...prev };
+
+      if (name === "name" && value.trim()) delete updated.name;
+      if (name === "address" && value.trim()) delete updated.address;
+      if (name === "service" && value) delete updated.service;
+      if (name === "date" && value) delete updated.date;
+      if (name === "time" && value) delete updated.time;
+
+      if (name === "phone") {
+        if (isValidPhone(value)) delete updated.phone;
+        else updated.phone = "Enter valid 10-digit phone";
+      }
+
+      if (name === "email" && isValidEmail(value)) delete updated.email;
+
+      return updated;
+    });
+  };
+
+  const validate = () => {
+    let newErrors: any = {};
+
+    if (!form.name.trim()) newErrors.name = "Name is required";
+
+    if (!form.phone.trim()) newErrors.phone = "Phone is required";
+    else if (!isValidPhone(form.phone))
+      newErrors.phone = "Enter valid 10-digit phone";
+
+    if (!form.email.trim()) newErrors.email = "Email is required";
+    else if (!isValidEmail(form.email))
+      newErrors.email = "Enter valid email";
+
+    if (!form.address.trim()) newErrors.address = "Address is required";
+    if (!form.service) newErrors.service = "Select a service";
+    if (!form.date) newErrors.date = "Select pickup date";
+    if (!form.time) newErrors.time = "Select pickup time";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = () => {
+    if (!validate()) return;
+
+    setToast("Service Booked Successfully 🎉");
+
+    setForm({
+      name: "",
+      phone: "",
+      email: "",
+      address: "",
+      service: "",
+      date: "",
+      time: "",
+      notes: ""
+    });
+
+    setTimeout(() => setToast(""), 2500);
+  };
+
+  const inputClass =
+    "w-full border border-blue-200 rounded-lg p-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition bg-white";
+
+  return (
+    <div className="min-h-screen bg-slate-50 py-12 md:py-16 px-4">
+
+      <div className="w-full max-w-lg mx-auto">
+
+        <div className="bg-white border border-blue-100 rounded-3xl p-6 md:p-8 shadow-sm space-y-5">
+
+          {/* TOAST */}
+          {toast && (
+            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-center font-medium">
+              {toast}
+            </div>
+          )}
+
+          {/* TITLE */}
+          <div className="text-center">
+            <h2 className="text-2xl md:text-3xl font-bold text-slate-900">
+              Book Laundry Service
+            </h2>
+            <p className="mt-2 text-slate-500">
+              Schedule your pickup and we’ll take care of the rest.
+            </p>
+          </div>
+
+          {/* NAME */}
+          <div>
+            <label className="font-semibold text-gray-700">Full Name</label>
+            <input name="name" value={form.name} onChange={handleChange} className={inputClass} />
+            {errors.name && <p className="text-red-500 text-xs">{errors.name}</p>}
+          </div>
+
+          {/* PHONE */}
+          <div>
+            <label className="font-semibold text-gray-700">Phone Number</label>
+            <input name="phone" value={form.phone} onChange={handleChange} className={inputClass} />
+            {errors.phone && <p className="text-red-500 text-xs">{errors.phone}</p>}
+          </div>
+
+          {/* EMAIL */}
+          <div>
+            <label className="font-semibold text-gray-700">Email</label>
+            <input name="email" value={form.email} onChange={handleChange} className={inputClass} />
+            {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
+          </div>
+
+          {/* ADDRESS */}
+          <div>
+            <label className="font-semibold text-gray-700">Pickup Address</label>
+            <textarea name="address" value={form.address} onChange={handleChange} className={inputClass} />
+            {errors.address && <p className="text-red-500 text-xs">{errors.address}</p>}
+          </div>
+
+          {/* SERVICE */}
+          <div ref={dropdownRef}>
+            <label className="font-semibold text-gray-700">Service</label>
+            <div
+              onClick={() => setOpenService(!openService)}
+              className="border border-blue-200 rounded-lg p-3 mt-1 cursor-pointer"
+            >
+              {form.service || "Select Service"}
+            </div>
+          </div>
+
+          {/* DATE & TIME */}
+          <div className="grid grid-cols-2 gap-3">
+            <button onClick={() => setOpenPicker("date")} className={inputClass}>
+              {form.date || "Select Date"}
+            </button>
+
+            <button onClick={() => setOpenPicker("time")} className={inputClass}>
+              {form.time || "Select Time"}
+            </button>
+          </div>
+
+          {/* NOTES */}
+          <textarea
+            name="notes"
+            value={form.notes}
+            onChange={handleChange}
+            className={inputClass}
+            placeholder="Special instructions (optional)"
+          />
+
+          {/* BUTTON */}
+          <button
+            onClick={handleSubmit}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold"
+          >
+            Book Now
+          </button>
+
+        </div>
+      </div>
+    </div>
+  );
+}
