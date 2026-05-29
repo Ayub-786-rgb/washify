@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { SERVICES } from "../constants/data";
+import { WHATSAPP_NUMBER } from "../constants/data";
 
 const FEATURES = [
   "⚡ 24–48 Hour Delivery",
@@ -169,7 +170,7 @@ export default function Home() {
 
       {/* ================= WHATSAPP FLOAT BUTTON ================= */}
       <a
-        href="https://wa.me/919876543210?text=Hi%2C%20I%20want%20to%20book%20a%20laundry%20pickup"
+        href={`https://wa.me/91${WHATSAPP_NUMBER}?text=Hi%2C%20I%20want%20to%20book%20a%20laundry%20pickup`}
         target="_blank"
         rel="noreferrer"
         className="
