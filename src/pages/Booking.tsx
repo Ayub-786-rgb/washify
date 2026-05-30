@@ -1,5 +1,30 @@
 import { useEffect, useRef, useState } from "react";
 
+import { SERVICES } from "../constants/data";
+
+// CalendarDaysIcon SVG
+function CalendarDaysIcon({ className = "w-5 h-5 text-primary mr-2" }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="6" width="18" height="15" rx="2" stroke="currentColor" strokeWidth="1.5" fill="none" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M16 2v4M8 2v4M3 10h18" />
+      <circle cx="8.5" cy="14.5" r="1" fill="currentColor" />
+      <circle cx="12" cy="14.5" r="1" fill="currentColor" />
+      <circle cx="15.5" cy="14.5" r="1" fill="currentColor" />
+    </svg>
+  );
+}
+
+// ClockIcon SVG
+function ClockIcon({ className = "w-5 h-5 text-primary mr-2" }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" fill="none" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 7v5l3 3" />
+    </svg>
+  );
+}
+
 export default function Booking() {
   const [form, setForm] = useState({
     name: "",
@@ -183,25 +208,88 @@ export default function Booking() {
           </div>
 
           {/* SERVICE */}
-          <div ref={dropdownRef}>
+          <div className="relative" ref={dropdownRef}>
             <label className="font-semibold text-gray-700">Service</label>
             <div
-              onClick={() => setOpenService(!openService)}
-              className="border border-blue-200 rounded-lg p-3 mt-1 cursor-pointer"
+              onClick={() => setOpenService((v) => !v)}
+              className="border border-blue-200 rounded-lg p-3 mt-1 cursor-pointer bg-white"
             >
               {form.service || "Select Service"}
             </div>
+            {openService && (
+              <div className="absolute z-10 left-0 right-0 bg-white border border-blue-200 rounded-lg mt-1 shadow-lg max-h-60 overflow-y-auto">
+                {SERVICES.map((service) => (
+                  <div
+                    key={service.id}
+                    className={`p-3 hover:bg-blue-50 cursor-pointer flex items-center gap-2 ${form.service === service.name ? "bg-blue-100" : ""}`}
+                    onClick={() => {
+                      setForm({ ...form, service: service.name });
+                      setOpenService(false);
+                      setErrors((prev: any) => ({ ...prev, service: undefined }));
+                    }}
+                  >
+                    <span>{service.icon}</span>
+                    <span>{service.name}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {errors.service && <p className="text-red-500 text-xs">{errors.service}</p>}
           </div>
 
           {/* DATE & TIME */}
-          <div className="grid grid-cols-2 gap-3">
-            <button onClick={() => setOpenPicker("date")} className={inputClass}>
-              {form.date || "Select Date"}
-            </button>
-
-            <button onClick={() => setOpenPicker("time")} className={inputClass}>
-              {form.time || "Select Time"}
-            </button>
+          <div className="grid grid-cols-2 gap-3 relative">
+            <div className="relative">
+              <button type="button" onClick={() => setOpenPicker(openPicker === "date" ? null : "date")} className={inputClass + " flex items-center"}>
+                <CalendarDaysIcon />
+                <span>{form.date || "Select Date"}</span>
+              </button>
+              {openPicker === "date" && (
+                <div className="absolute z-20 left-0 right-0 bg-white border border-blue-200 rounded-lg mt-1 shadow-lg max-h-60 overflow-y-auto">
+                  {getDates().map((d) => {
+                    const dateStr = d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+                    return (
+                      <div
+                        key={d.toISOString()}
+                        className={`p-3 hover:bg-blue-50 cursor-pointer ${form.date === dateStr ? "bg-blue-100" : ""}`}
+                        onClick={() => {
+                          setForm({ ...form, date: dateStr });
+                          setOpenPicker(null);
+                          setErrors((prev: any) => ({ ...prev, date: undefined }));
+                        }}
+                      >
+                        {dateStr}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              {errors.date && <p className="text-red-500 text-xs">{errors.date}</p>}
+            </div>
+            <div className="relative">
+              <button type="button" onClick={() => setOpenPicker(openPicker === "time" ? null : "time")} className={inputClass + " flex items-center"}>
+                <ClockIcon />
+                <span>{form.time || "Select Time"}</span>
+              </button>
+              {openPicker === "time" && (
+                <div className="absolute z-20 left-0 right-0 bg-white border border-blue-200 rounded-lg mt-1 shadow-lg max-h-60 overflow-y-auto">
+                  {times.map((t) => (
+                    <div
+                      key={t}
+                      className={`p-3 hover:bg-blue-50 cursor-pointer ${form.time === t ? "bg-blue-100" : ""}`}
+                      onClick={() => {
+                        setForm({ ...form, time: t });
+                        setOpenPicker(null);
+                        setErrors((prev: any) => ({ ...prev, time: undefined }));
+                      }}
+                    >
+                      {t}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {errors.time && <p className="text-red-500 text-xs">{errors.time}</p>}
+            </div>
           </div>
 
           {/* NOTES */}
