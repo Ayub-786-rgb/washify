@@ -1,15 +1,21 @@
 import { useEffect, useRef, useState } from "react";
-
 import { SERVICES } from "../constants/data";
 
 // CalendarDaysIcon SVG
 function CalendarDaysIcon({ className = "w-5 h-5 text-primary mr-2" }: { className?: string }) {
   return (
-    <svg className={className} fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <rect x="3" y="6" width="18" height="15" rx="2" stroke="currentColor" strokeWidth="1.5" fill="none" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M16 2v4M8 2v4M3 10h18" />
       <circle cx="8.5" cy="14.5" r="1" fill="currentColor" />
-      <circle cx="12" cy="14.5" r="1" fill="currentColor" />
+      <circle cx="12" cy="14.5" r="1" />
       <circle cx="15.5" cy="14.5" r="1" fill="currentColor" />
     </svg>
   );
@@ -18,7 +24,14 @@ function CalendarDaysIcon({ className = "w-5 h-5 text-primary mr-2" }: { classNa
 // ClockIcon SVG
 function ClockIcon({ className = "w-5 h-5 text-primary mr-2" }: { className?: string }) {
   return (
-    <svg className={className} fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" fill="none" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M12 7v5l3 3" />
     </svg>
@@ -45,25 +58,18 @@ export default function Booking() {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const isValidEmail = (email: string) =>
-    /\S+@\S+\.\S+/.test(email);
-
-  const isValidPhone = (phone: string) =>
-    /^[0-9]{10}$/.test(phone);
+  const isValidEmail = (email: string) => /\S+@\S+\.\S+/.test(email);
+  const isValidPhone = (phone: string) => /^[0-9]{10}$/.test(phone);
 
   useEffect(() => {
     const handleClickOutside = (e: any) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setOpenService(false);
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const getDates = () => {
@@ -83,9 +89,7 @@ export default function Booking() {
   ];
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
 
@@ -115,14 +119,11 @@ export default function Booking() {
     let newErrors: any = {};
 
     if (!form.name.trim()) newErrors.name = "Name is required";
-
     if (!form.phone.trim()) newErrors.phone = "Phone is required";
-    else if (!isValidPhone(form.phone))
-      newErrors.phone = "Enter valid 10-digit phone";
+    else if (!isValidPhone(form.phone)) newErrors.phone = "Enter valid 10-digit phone";
 
     if (!form.email.trim()) newErrors.email = "Email is required";
-    else if (!isValidEmail(form.email))
-      newErrors.email = "Enter valid email";
+    else if (!isValidEmail(form.email)) newErrors.email = "Enter valid email";
 
     if (!form.address.trim()) newErrors.address = "Address is required";
     if (!form.service) newErrors.service = "Select a service";
@@ -157,17 +158,8 @@ export default function Booking() {
 
   return (
     <div className="min-h-screen bg-slate-50 py-12 md:py-16 px-4">
-
       <div className="w-full max-w-lg mx-auto">
-
         <div className="bg-white border border-blue-100 rounded-3xl p-6 md:p-8 shadow-sm space-y-5">
-
-          {/* TOAST */}
-          {toast && (
-            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-center font-medium">
-              {toast}
-            </div>
-          )}
 
           {/* TITLE */}
           <div className="text-center">
@@ -187,9 +179,19 @@ export default function Booking() {
           </div>
 
           {/* PHONE */}
+
           <div>
             <label className="font-semibold text-gray-700">Phone Number</label>
-            <input name="phone" value={form.phone} onChange={handleChange} className={inputClass} />
+            <input
+              name="phone"
+              value={form.phone}
+              onChange={handleChange}
+              className={inputClass}
+              type="tel"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              autoComplete="tel"
+            />
             {errors.phone && <p className="text-red-500 text-xs">{errors.phone}</p>}
           </div>
 
@@ -216,12 +218,15 @@ export default function Booking() {
             >
               {form.service || "Select Service"}
             </div>
+
             {openService && (
               <div className="absolute z-10 left-0 right-0 bg-white border border-blue-200 rounded-lg mt-1 shadow-lg max-h-60 overflow-y-auto">
                 {SERVICES.map((service) => (
                   <div
                     key={service.id}
-                    className={`p-3 hover:bg-blue-50 cursor-pointer flex items-center gap-2 ${form.service === service.name ? "bg-blue-100" : ""}`}
+                    className={`p-3 hover:bg-blue-50 cursor-pointer flex items-center gap-2 ${
+                      form.service === service.name ? "bg-blue-100" : ""
+                    }`}
                     onClick={() => {
                       setForm({ ...form, service: service.name });
                       setOpenService(false);
@@ -234,24 +239,38 @@ export default function Booking() {
                 ))}
               </div>
             )}
+
             {errors.service && <p className="text-red-500 text-xs">{errors.service}</p>}
           </div>
 
           {/* DATE & TIME */}
-          <div className="grid grid-cols-2 gap-3 relative">
-            <div className="relative">
-              <button type="button" onClick={() => setOpenPicker(openPicker === "date" ? null : "date")} className={inputClass + " flex items-center"}>
+          <div className="grid grid-cols-2 gap-3">
+            {/* DATE */}
+            <div>
+              <button
+                type="button"
+                onClick={() => setOpenPicker(openPicker === "date" ? null : "date")}
+                className={inputClass + " flex items-center"}
+              >
                 <CalendarDaysIcon />
                 <span>{form.date || "Select Date"}</span>
               </button>
+
               {openPicker === "date" && (
-                <div className="absolute z-20 left-0 right-0 bg-white border border-blue-200 rounded-lg mt-1 shadow-lg max-h-60 overflow-y-auto">
+                <div className="absolute z-20 bg-white border border-blue-200 rounded-lg mt-1 shadow-lg max-h-60 overflow-y-auto">
                   {getDates().map((d) => {
-                    const dateStr = d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+                    const dateStr = d.toLocaleDateString(undefined, {
+                      weekday: "short",
+                      month: "short",
+                      day: "numeric"
+                    });
+
                     return (
                       <div
                         key={d.toISOString()}
-                        className={`p-3 hover:bg-blue-50 cursor-pointer ${form.date === dateStr ? "bg-blue-100" : ""}`}
+                        className={`p-3 hover:bg-blue-50 cursor-pointer ${
+                          form.date === dateStr ? "bg-blue-100" : ""
+                        }`}
                         onClick={() => {
                           setForm({ ...form, date: dateStr });
                           setOpenPicker(null);
@@ -264,19 +283,29 @@ export default function Booking() {
                   })}
                 </div>
               )}
+
               {errors.date && <p className="text-red-500 text-xs">{errors.date}</p>}
             </div>
-            <div className="relative">
-              <button type="button" onClick={() => setOpenPicker(openPicker === "time" ? null : "time")} className={inputClass + " flex items-center"}>
+
+            {/* TIME */}
+            <div>
+              <button
+                type="button"
+                onClick={() => setOpenPicker(openPicker === "time" ? null : "time")}
+                className={inputClass + " flex items-center"}
+              >
                 <ClockIcon />
                 <span>{form.time || "Select Time"}</span>
               </button>
+
               {openPicker === "time" && (
-                <div className="absolute z-20 left-0 right-0 bg-white border border-blue-200 rounded-lg mt-1 shadow-lg max-h-60 overflow-y-auto">
+                <div className="absolute z-20 bg-white border border-blue-200 rounded-lg mt-1 shadow-lg max-h-60 overflow-y-auto">
                   {times.map((t) => (
                     <div
                       key={t}
-                      className={`p-3 hover:bg-blue-50 cursor-pointer ${form.time === t ? "bg-blue-100" : ""}`}
+                      className={`p-3 hover:bg-blue-50 cursor-pointer ${
+                        form.time === t ? "bg-blue-100" : ""
+                      }`}
                       onClick={() => {
                         setForm({ ...form, time: t });
                         setOpenPicker(null);
@@ -288,6 +317,7 @@ export default function Booking() {
                   ))}
                 </div>
               )}
+
               {errors.time && <p className="text-red-500 text-xs">{errors.time}</p>}
             </div>
           </div>
@@ -301,6 +331,13 @@ export default function Booking() {
             placeholder="Special instructions (optional)"
           />
 
+          {/* TOAST (moved above button) */}
+          {toast && (
+            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-center font-medium">
+              {toast}
+            </div>
+          )}
+
           {/* BUTTON */}
           <button
             onClick={handleSubmit}
@@ -308,7 +345,6 @@ export default function Booking() {
           >
             Book Now
           </button>
-
         </div>
       </div>
     </div>
